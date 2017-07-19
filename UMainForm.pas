@@ -1,14 +1,12 @@
-unit Unit1;
+unit UMainForm;
 
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, Grids, DBGrids, DB, ADODB, StdCtrls, SynEdit,
-  SynEditHighlighter, SynHighlighterSQL;
+  Classes, Forms, Controls, Dialogs, DBGrids, StdCtrls, Grids, DB, SynEdit, ADODB, SynHighlighterSQL, SynEditHighlighter;
 
 type
-  TForm1 = class(TForm)
+  TMainForm = class(TForm)
     ADOConnection1: TADOConnection;
     ADOTable1: TADOTable;
     DataSource1: TDataSource;
@@ -21,23 +19,21 @@ type
     SynSQLSyn1: TSynSQLSyn;
     procedure Button1Click(Sender: TObject);
     procedure LBTabelasClick(Sender: TObject);
-    procedure SynEdit1KeyDown(Sender: TObject; var Key: Word;
-      Shift: TShiftState);
-    procedure DBGrid1KeyDown(Sender: TObject; var Key: Word;
-      Shift: TShiftState);
+    procedure SynEdit1KeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure DBGrid1KeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     FFileName: String;
     procedure PreencheListaDeTabelas;
   end;
 
 var
-  Form1: TForm1;
+  MainForm: TMainForm;
 
 implementation
 
 {$R *.dfm}
 
-procedure TForm1.Button1Click(Sender: TObject);
+procedure TMainForm.Button1Click(Sender: TObject);
 begin
    if not OpenDialog1.Execute then Exit;
 
@@ -67,7 +63,7 @@ begin
    Caption := FFileName;
 end;
 
-procedure TForm1.LBTabelasClick(Sender: TObject);
+procedure TMainForm.LBTabelasClick(Sender: TObject);
 var SelectedTableName: String;
 begin
    DataSource1.DataSet := ADOTable1;
@@ -81,7 +77,7 @@ begin
    Caption := FFileName + ' - ' + SelectedTableName;
 end;
 
-procedure TForm1.PreencheListaDeTabelas;
+procedure TMainForm.PreencheListaDeTabelas;
 var TableNames: TStringList;
 begin
    TableNames := TStringList.Create;
@@ -92,7 +88,7 @@ begin
    TableNames.Free;
 end;
 
-procedure TForm1.SynEdit1KeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+procedure TMainForm.SynEdit1KeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
    if Key=116 then begin
       DataSource1.DataSet := ADOQuery1;
@@ -101,7 +97,7 @@ begin
    end;
 end;
 
-procedure TForm1.DBGrid1KeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+procedure TMainForm.DBGrid1KeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
    if (ssCtrl in Shift) and (Key=13) then begin
       SynEdit1.SetFocus;
@@ -109,3 +105,4 @@ begin
 end;
 
 end.
+

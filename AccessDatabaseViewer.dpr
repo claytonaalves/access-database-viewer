@@ -2,12 +2,12 @@ program AccessDatabaseViewer;
 
 uses
   Forms,
-  Unit1 in 'Unit1.pas' {Form1};
+  UMainForm in 'UMainForm.pas' {MainForm};
 
 {$R *.res}
 
 begin
   Application.Initialize;
-  Application.CreateForm(TForm1, Form1);
+  Application.CreateForm(TMainForm, MainForm);
   Application.Run;
 end.
