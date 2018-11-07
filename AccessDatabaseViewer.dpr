@@ -2,7 +2,8 @@ program AccessDatabaseViewer;
 
 uses
   Forms,
-  UMainForm in 'UMainForm.pas' {MainForm};
+  UMainForm in 'UMainForm.pas' {MainForm},
+  MSAccessU in 'Source\MSAccessU.pas';
 
 {$R *.res}
 
