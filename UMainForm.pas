@@ -3,7 +3,9 @@ unit UMainForm;
 interface
 
 uses
-  Classes, Forms, Controls, Dialogs, DBGrids, StdCtrls, Grids, DB, SynEdit, ADODB, SynHighlighterSQL, SynEditHighlighter, MSAccessU;
+  Classes, Forms, Controls, Dialogs, DBGrids, StdCtrls, Grids, DB, SynEdit, ADODB, SynHighlighterSQL, SynEditHighlighter, MSAccessU,
+  Menus,
+  ComCtrls;
 
 type
   TMainForm = class(TForm)
@@ -11,16 +13,26 @@ type
     ADOTable1: TADOTable;
     DataSource1: TDataSource;
     DBGrid1: TDBGrid;
-    Button1: TButton;
     OpenDialog1: TOpenDialog;
     LBTabelas: TListBox;
     ADOQuery1: TADOQuery;
     SynEdit1: TSynEdit;
     SynSQLSyn1: TSynSQLSyn;
-    procedure Button1Click(Sender: TObject);
+    MainMenu1: TMainMenu;
+    Arquivo1: TMenuItem;
+    Visualizar1: TMenuItem;
+    Abrir1: TMenuItem;
+    N1: TMenuItem;
+    Sair1: TMenuItem;
+    StatusBar: TStatusBar;
+    abelas1: TMenuItem;
+    Filtrar1: TMenuItem;
+    NmerodeRegistrosnatabela1: TMenuItem;
+    procedure AbrirArquivoClick(Sender: TObject);
     procedure LBTabelasClick(Sender: TObject);
     procedure SynEdit1KeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure DBGrid1KeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure Sair1Click(Sender: TObject);
   private
     FFileName: String;
     procedure PreencheListaDeTabelas;
@@ -46,7 +58,7 @@ begin
    CloseFile(Arq);
 end;
 
-procedure TMainForm.Button1Click(Sender: TObject);
+procedure TMainForm.AbrirArquivoClick(Sender: TObject);
 var Password: String;
 begin
    if not OpenDialog1.Execute then Exit;
@@ -87,6 +99,8 @@ begin
    LBTabelas.Items := TableNames;
 
    TableNames.Free;
+
+   StatusBar.Panels[0].Text := Format('%d tabelas', [LBTabelas.Count]);
 end;
 
 procedure TMainForm.SynEdit1KeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -103,6 +117,11 @@ begin
    if (ssCtrl in Shift) and (Key=13) then begin
       SynEdit1.SetFocus;
    end;
+end;
+
+procedure TMainForm.Sair1Click(Sender: TObject);
+begin
+   Application.Terminate;
 end;
 
 end.

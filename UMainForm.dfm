@@ -1,8 +1,8 @@
 object MainForm: TMainForm
-  Left = 349
-  Top = 211
-  Width = 859
-  Height = 400
+  Left = 334
+  Top = 151
+  Width = 877
+  Height = 455
   Caption = 'Visualizador Banco de Dados Access'
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -181,21 +181,22 @@ object MainForm: TMainForm
     0007E0000007E0000007E0000007E0000007E0000007E0000007E0000007E000
     0007E0000007E0000007E0000007E0000007E0000007E0000007E0000007E000
     0007E0000007E0000007F000000FFC00003FFFFFFFFF}
+  Menu = MainMenu1
   OldCreateOrder = False
   Position = poScreenCenter
   DesignSize = (
-    843
-    362)
+    861
+    397)
   PixelsPerInch = 96
   TextHeight = 13
   object DBGrid1: TDBGrid
-    Left = 168
-    Top = 169
-    Width = 666
-    Height = 181
+    Left = 157
+    Top = 118
+    Width = 699
+    Height = 260
     Anchors = [akLeft, akTop, akRight, akBottom]
     DataSource = DataSource1
-    TabOrder = 2
+    TabOrder = 1
     TitleFont.Charset = DEFAULT_CHARSET
     TitleFont.Color = clWindowText
     TitleFont.Height = -11
@@ -203,30 +204,21 @@ object MainForm: TMainForm
     TitleFont.Style = []
     OnKeyDown = DBGrid1KeyDown
   end
-  object Button1: TButton
-    Left = 9
-    Top = 8
-    Width = 112
-    Height = 25
-    Caption = '&Selecionar Arquivo'
-    TabOrder = 0
-    OnClick = Button1Click
-  end
   object LBTabelas: TListBox
-    Left = 8
-    Top = 39
+    Left = 0
+    Top = 0
     Width = 157
-    Height = 311
-    Anchors = [akLeft, akTop, akBottom]
+    Height = 378
+    Align = alLeft
     ItemHeight = 13
-    TabOrder = 1
+    TabOrder = 0
     OnClick = LBTabelasClick
   end
   object SynEdit1: TSynEdit
-    Left = 168
-    Top = 40
-    Width = 665
-    Height = 124
+    Left = 157
+    Top = 0
+    Width = 699
+    Height = 117
     Anchors = [akLeft, akTop, akRight]
     Ctl3D = True
     ParentCtl3D = False
@@ -235,7 +227,7 @@ object MainForm: TMainForm
     Font.Height = -13
     Font.Name = 'Courier New'
     Font.Style = []
-    TabOrder = 3
+    TabOrder = 2
     OnKeyDown = SynEdit1KeyDown
     Gutter.AutoSize = True
     Gutter.DigitCount = 2
@@ -247,6 +239,19 @@ object MainForm: TMainForm
     Gutter.ShowLineNumbers = True
     Highlighter = SynSQLSyn1
     Options = [eoAutoIndent, eoDragDropEditing, eoEnhanceEndKey, eoGroupUndo, eoScrollPastEol, eoShowScrollHint, eoSmartTabDelete, eoSmartTabs, eoTabsToSpaces, eoTrimTrailingSpaces]
+  end
+  object StatusBar: TStatusBar
+    Left = 0
+    Top = 378
+    Width = 861
+    Height = 19
+    Panels = <
+      item
+        Width = 150
+      end
+      item
+        Width = 50
+      end>
   end
   object ADOConnection1: TADOConnection
     LoginPrompt = False
@@ -283,5 +288,35 @@ object MainForm: TMainForm
     KeyAttri.Foreground = clMenuHighlight
     Left = 208
     Top = 8
+  end
+  object MainMenu1: TMainMenu
+    Left = 416
+    Top = 184
+    object Arquivo1: TMenuItem
+      Caption = 'Arquivo'
+      object Abrir1: TMenuItem
+        Caption = 'Abrir'
+        OnClick = AbrirArquivoClick
+      end
+      object N1: TMenuItem
+        Caption = '-'
+      end
+      object Sair1: TMenuItem
+        Caption = 'Sair'
+        OnClick = Sair1Click
+      end
+    end
+    object Visualizar1: TMenuItem
+      Caption = 'Visualizar'
+      object NmerodeRegistrosnatabela1: TMenuItem
+        Caption = 'N'#250'mero de Registros na tabela'
+      end
+    end
+    object abelas1: TMenuItem
+      Caption = 'Tabelas'
+      object Filtrar1: TMenuItem
+        Caption = 'Filtrar'
+      end
+    end
   end
 end
