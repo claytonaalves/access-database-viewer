@@ -185,14 +185,14 @@ object MainForm: TMainForm
   Position = poScreenCenter
   DesignSize = (
     843
-    361)
+    362)
   PixelsPerInch = 96
   TextHeight = 13
   object DBGrid1: TDBGrid
     Left = 168
     Top = 169
     Width = 666
-    Height = 179
+    Height = 181
     Anchors = [akLeft, akTop, akRight, akBottom]
     DataSource = DataSource1
     TabOrder = 2

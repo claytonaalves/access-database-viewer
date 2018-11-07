@@ -6,6 +6,8 @@ uses
   Classes, Forms, Controls, Dialogs, DBGrids, StdCtrls, Grids, DB, SynEdit, ADODB, SynHighlighterSQL, SynEditHighlighter;
 
 type
+  TByteArray = array[0..85] of byte;
+
   TMainForm = class(TForm)
     ADOConnection1: TADOConnection;
     ADOTable1: TADOTable;
@@ -24,6 +26,8 @@ type
   private
     FFileName: String;
     procedure PreencheListaDeTabelas;
+    function XorPassword(Bytes: TByteArray): String;
+    function LeArquivo(const FileName: String): TByteArray;
   end;
 
 var
@@ -31,33 +35,49 @@ var
 
 implementation
 
+uses SysUtils;
+
 {$R *.dfm}
 
+function TMainForm.XorPassword(Bytes: TByteArray): String;
+const
+    XorBytes: array[0..17] of byte = ($86, $FB, $EC, $37, $5D, $44, $9C, $FA, $C6, $5E, $28, $E6, $13, $B6, $8A, $60, $54, $94);
+var
+   i: Integer;
+   CurrChar: Char;
+begin
+    Result := '';
+    for i := 0 to 17 do begin
+        CurrChar := chr(ord(bytes[i + $42]) xor XorBytes[i]);
+        if CurrChar = #0 then
+           break;
+        Result := Result + CurrChar;
+    end;
+end;
+
+function TMainForm.LeArquivo(const FileName: String): TByteArray;
+var Arq: File;
+begin
+   AssignFile(Arq, FileName);
+   FileMode := fmOpenRead;
+   Reset(Arq, 1);
+   BlockRead(Arq, Result, 85);
+   CloseFile(Arq);
+end;
+
 procedure TMainForm.Button1Click(Sender: TObject);
+var Password: String;
 begin
    if not OpenDialog1.Execute then Exit;
 
    FFileName := OpenDialog1.FileName;
 
+   Password := XorPassword(LeArquivo(FFileName));
+
    ADOConnection1.Connected := False;
    ADOConnection1.ConnectionString :=
-      'Provider=Microsoft.Jet.OLEDB.4.0;' +
-      'User ID=Admin;' +
-      'Data Source=' + FFileName + ';' +
-      'Mode=Share Deny None;' +
-      'Jet OLEDB:System database="";' +
-      'Jet OLEDB:Registry Path="";' +
-      'Jet OLEDB:Database Password="";' +
-      'Jet OLEDB:Engine Type=5;' +
-      'Jet OLEDB:Database Locking Mode=1;' +
-      'Jet OLEDB:Global Partial Bulk Ops=2;' +
-      'Jet OLEDB:Global Bulk Transactions=1;' +
-      'Jet OLEDB:New Database Password="";' +
-      'Jet OLEDB:Create System Database=False;' +
-      'Jet OLEDB:Encrypt Database=False;' +
-      'Jet OLEDB:Don''t Copy Locale on Compact=False;' +
-      'Jet OLEDB:Compact Without Replica Repair=False;' +
-      'Jet OLEDB:SFP=False;';
+      'Provider=Microsoft.Jet.OLEDB.4.0; Data Source=' + FFileName + ';Persist Security Info=False;Jet OLEDB:Database Password="'+ Password +'"';
+
    ADOConnection1.Connected := True;
    PreencheListaDeTabelas;
    Caption := FFileName;
