@@ -4,8 +4,7 @@ interface
 
 uses
   Windows, Classes, Forms, Controls, Dialogs, DBGrids, StdCtrls, Grids, DB, SynEdit, ADODB, SynHighlighterSQL, SynEditHighlighter, MSAccessU,
-  Menus,
-  ComCtrls;
+  Menus, ComCtrls, UFileCatcher, Messages;
 
 type
   TMainForm = class(TForm)
@@ -45,6 +44,8 @@ type
       Shift: TShiftState; X, Y: Integer);
     procedure mnuEsconderColunaClick(Sender: TObject);
     procedure MedirDensidadeClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
   private
     FFileName: String;
     procedure PreencheListaDeTabelas;
@@ -52,6 +53,8 @@ type
     function LeArquivo(const FileName: String): MSAccessU.TByteArray;
     procedure AtivaDesativaColunaGrid(Sender: TObject);
     function FixQuotes(S: String): String;
+    procedure WMDropFiles(var Msg: TWMDropFiles); message WM_DROPFILES;
+    procedure OpenAccessDatabaseFile(const Filename: String);
   end;
 
 var
@@ -59,9 +62,19 @@ var
 
 implementation
 
-uses SysUtils;
+uses SysUtils, ShellAPI;
 
 {$R *.dfm}
+
+procedure TMainForm.FormCreate(Sender: TObject);
+begin
+   DragAcceptFiles(Handle, True);
+end;
+
+procedure TMainForm.FormDestroy(Sender: TObject);
+begin
+   DragAcceptFiles(Handle, False);
+end;
 
 function TMainForm.LeArquivo(const FileName: String): MSAccessU.TByteArray;
 var Arq: File;
@@ -74,21 +87,24 @@ begin
 end;
 
 procedure TMainForm.AbrirArquivoClick(Sender: TObject);
-var Password: String;
 begin
    if not OpenDialog1.Execute then Exit;
 
-   FFileName := OpenDialog1.FileName;
+   OpenAccessDatabaseFile(OpenDialog1.FileName);
+end;
 
-   Password := XorPassword(LeArquivo(FFileName));
+procedure TMainForm.OpenAccessDatabaseFile(const Filename: String);
+var Password: String;
+begin
+   Password := XorPassword(LeArquivo(FileName));
 
    ADOConnection1.Connected := False;
    ADOConnection1.ConnectionString :=
-      'Provider=Microsoft.Jet.OLEDB.4.0; Data Source=' + FFileName + ';Persist Security Info=False;Jet OLEDB:Database Password="'+ Password +'"';
+      'Provider=Microsoft.Jet.OLEDB.4.0; Data Source=' + FileName + ';Persist Security Info=False;Jet OLEDB:Database Password="'+ Password +'"';
 
    ADOConnection1.Connected := True;
    PreencheListaDeTabelas;
-   Caption := FFileName;
+   Caption := FileName;
 end;
 
 procedure TMainForm.TabelaSelecionadaHandler(Sender: TObject);
@@ -267,6 +283,27 @@ begin
 
    ADOQuery1.GotoBookmark(Bookmark);
    ADOQuery1.EnableControls;
+end;
+
+procedure TMainForm.WMDropFiles(var Msg: TWMDropFiles);
+var
+  I: Integer;                 // loops thru all dropped files
+  DropPoint: TPoint;          // point where files dropped
+  Catcher: TFileCatcher;      // file catcher class
+begin
+  Catcher := TFileCatcher.Create(Msg.Drop);
+  try
+    for I := 0 to Pred(Catcher.FileCount) do
+    begin
+      // ... code to process file here
+      OpenAccessDatabaseFile(Catcher.Files[I]);
+    end;
+    DropPoint := Catcher.DropPoint;
+    // ... do something with drop point
+  finally
+    Catcher.Free;
+  end;
+  Msg.Result := 0;
 end;
 
 end.
