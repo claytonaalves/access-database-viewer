@@ -189,20 +189,22 @@ object MainForm: TMainForm
     397)
   PixelsPerInch = 96
   TextHeight = 13
-  object DBGrid1: TDBGrid
+  object MainGrid: TDBGrid
     Left = 157
     Top = 118
     Width = 699
     Height = 260
     Anchors = [akLeft, akTop, akRight, akBottom]
     DataSource = DataSource1
+    PopupMenu = GridPopupMenu
     TabOrder = 1
     TitleFont.Charset = DEFAULT_CHARSET
     TitleFont.Color = clWindowText
     TitleFont.Height = -11
     TitleFont.Name = 'MS Sans Serif'
     TitleFont.Style = []
-    OnKeyDown = DBGrid1KeyDown
+    OnKeyDown = MainGridKeyDown
+    OnMouseDown = MainGridMouseDown
   end
   object LBTabelas: TListBox
     Left = 0
@@ -212,9 +214,9 @@ object MainForm: TMainForm
     Align = alLeft
     ItemHeight = 13
     TabOrder = 0
-    OnClick = LBTabelasClick
+    OnClick = TabelaSelecionadaHandler
   end
-  object SynEdit1: TSynEdit
+  object SqlEditor: TSynEdit
     Left = 157
     Top = 0
     Width = 699
@@ -228,7 +230,7 @@ object MainForm: TMainForm
     Font.Name = 'Courier New'
     Font.Style = []
     TabOrder = 2
-    OnKeyDown = SynEdit1KeyDown
+    OnKeyDown = SqlEditorKeyDown
     Gutter.AutoSize = True
     Gutter.DigitCount = 2
     Gutter.Font.Charset = DEFAULT_CHARSET
@@ -239,6 +241,7 @@ object MainForm: TMainForm
     Gutter.ShowLineNumbers = True
     Highlighter = SynSQLSyn1
     Options = [eoAutoIndent, eoDragDropEditing, eoEnhanceEndKey, eoGroupUndo, eoScrollPastEol, eoShowScrollHint, eoSmartTabDelete, eoSmartTabs, eoTabsToSpaces, eoTrimTrailingSpaces]
+    WordWrap = True
   end
   object StatusBar: TStatusBar
     Left = 0
@@ -246,6 +249,9 @@ object MainForm: TMainForm
     Width = 861
     Height = 19
     Panels = <
+      item
+        Width = 150
+      end
       item
         Width = 150
       end
@@ -317,6 +323,32 @@ object MainForm: TMainForm
       object Filtrar1: TMenuItem
         Caption = 'Filtrar'
       end
+    end
+  end
+  object GridPopupMenu: TPopupMenu
+    Left = 576
+    Top = 232
+    object mnuColunas: TMenuItem
+      Caption = 'Colunas'
+    end
+    object N2: TMenuItem
+      Caption = '-'
+    end
+    object mnuGerarSelect: TMenuItem
+      Caption = 'Gerar SELECT'
+      OnClick = mnuGerarSelectClick
+    end
+  end
+  object ColumnPopupMenu: TPopupMenu
+    Left = 680
+    Top = 232
+    object mnuEsconderColuna: TMenuItem
+      Caption = 'Esconder coluna'
+      OnClick = mnuEsconderColunaClick
+    end
+    object mnuMedirDensidade: TMenuItem
+      Caption = 'Medir densidade'
+      OnClick = MedirDensidadeClick
     end
   end
 end
