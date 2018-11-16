@@ -10,6 +10,8 @@ type
   TFrmDBType = class(TForm)
     LBDatabases: TListBox;
     procedure LBDatabasesDblClick(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
   private
     { Private declarations }
   public
@@ -26,6 +28,14 @@ implementation
 procedure TFrmDBType.LBDatabasesDblClick(Sender: TObject);
 begin
    ModalResult := mrOk;
+end;
+
+procedure TFrmDBType.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+   case Key of
+      13: ModalResult := mrOk;
+      27: ModalResult := mrCancel;
+   end;
 end;
 
 end.

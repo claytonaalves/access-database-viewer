@@ -333,9 +333,14 @@ object MainForm: TMainForm
       Caption = 'Medir densidade'
       OnClick = MedirDensidadeClick
     end
+    object mnuHideEmptyColumns: TMenuItem
+      Caption = 'Ocultar campos sem valor'
+      OnClick = mnuHideEmptyColumnsClick
+    end
   end
   object DBConnection: TZConnection
     ControlsCodePage = cGET_ACP
+    AutoEncodeStrings = False
     Port = 0
     Database = 
       'Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Ello\Dados\Impor' +

@@ -34,6 +34,7 @@ type
     mnuSair: TMenuItem;
     mnuTabelas: TMenuItem;
     mnuVisualizar: TMenuItem;
+    mnuHideEmptyColumns: TMenuItem;
     procedure AbrirArquivoClick(Sender: TObject);
     procedure TabelaSelecionadaHandler(Sender: TObject);
     procedure SqlEditorKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -45,6 +46,7 @@ type
     procedure MedirDensidadeClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure mnuHideEmptyColumnsClick(Sender: TObject);
   private
     FFileName: String;
     procedure PreencheListaDeTabelas;
@@ -58,6 +60,7 @@ type
     procedure OpenFirebirdDatabase;
     procedure OpenSQLiteDatabase;
     procedure OpenMySQLDatabase;
+    function GetColumnDensity(ColumnIndex: Integer): Double;
   end;
 
 var
@@ -110,7 +113,7 @@ begin
    DBConnection.HostName := '10.1.1.100';
    DBConnection.User := 'root';
    DBConnection.Password := '1234';
-   DBConnection.Database := 'vigo_erp';
+   DBConnection.Database := 'unicheff';
    DBConnection.Connected := True;
 
    PreencheListaDeTabelas;
@@ -308,13 +311,31 @@ begin
 end;
 
 procedure TMainForm.MedirDensidadeClick(Sender: TObject);
+begin
+   ShowMessage(Format('%.4f%%', [GetColumnDensity(mnuMedirDensidade.Tag)]));
+end;
+
+procedure TMainForm.mnuHideEmptyColumnsClick(Sender: TObject);
+var
+   i: Integer;
+   Density: Double;
+begin
+   Screen.Cursor := crHourGlass;
+   for i := 0 to MainGrid.Columns.Count - 1 do begin
+      Density := GetColumnDensity(i);
+      if (Density = 100) and (MainGrid.SelectedField.AsString = '') then
+         MainGrid.Columns[i].Visible := False;
+   end;
+   Screen.Cursor := crDefault;
+end;
+
+function TMainForm.GetColumnDensity(ColumnIndex: Integer): Double;
 var
    sl: TStringList;
    Bookmark: Pointer;
    TotalNumberRows, DistinctValues: Integer;
-   Selectivity: Double;
 begin
-   MainGrid.SelectedIndex := mnuMedirDensidade.Tag;
+   MainGrid.SelectedIndex := ColumnIndex;
 
    TotalNumberRows := Query.RecordCount;
    Bookmark := Query.GetBookmark;
@@ -332,9 +353,7 @@ begin
    DistinctValues := sl.Count;
    sl.Free;
 
-   Selectivity := (1 / DistinctValues) * 100;
-
-   ShowMessage(Format('%.4f%%', [Selectivity]));
+   Result := (1 / DistinctValues) * 100;
 
    Query.GotoBookmark(Bookmark);
    Query.EnableControls;
