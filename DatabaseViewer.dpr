@@ -1,10 +1,10 @@
-program AccessDatabaseViewer;
+program DatabaseViewer;
 
 uses
   Forms,
-  UMainForm in 'UMainForm.pas' {MainForm},
   MSAccessU in 'Source\MSAccessU.pas',
   UFileCatcher in 'Source\UFileCatcher.pas',
+  UMainForm in 'Source\UI\UMainForm.pas' {MainForm},
   UFormDBType in 'Source\UI\UFormDBType.pas' {FrmDBType};
 
 {$R *.res}
