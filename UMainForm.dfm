@@ -3,7 +3,7 @@ object MainForm: TMainForm
   Top = 151
   Width = 877
   Height = 455
-  Caption = 'Visualizador Banco de Dados Access'
+  Caption = 'Database Viewer'
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -241,7 +241,7 @@ object MainForm: TMainForm
     Gutter.Font.Name = 'Courier New'
     Gutter.Font.Style = []
     Gutter.ShowLineNumbers = True
-    Highlighter = SynSQLSyn1
+    Highlighter = SQLSyntaxHighliter
     Options = [eoAutoIndent, eoDragDropEditing, eoEnhanceEndKey, eoGroupUndo, eoScrollPastEol, eoShowScrollHint, eoSmartTabDelete, eoSmartTabs, eoTabsToSpaces, eoTrimTrailingSpaces]
     WordWrap = True
   end
@@ -261,23 +261,10 @@ object MainForm: TMainForm
         Width = 50
       end>
   end
-  object ADOConnection1: TADOConnection
-    LoginPrompt = False
-    Mode = cmShareDenyNone
-    Provider = 'Microsoft.Jet.OLEDB.4.0'
-    Left = 288
-    Top = 8
-  end
-  object ADOTable1: TADOTable
-    Connection = ADOConnection1
-    TableName = 'RECEBER'
-    Left = 400
-    Top = 8
-  end
   object DataSource1: TDataSource
-    DataSet = ADOTable1
-    Left = 488
-    Top = 8
+    DataSet = Query
+    Left = 363
+    Top = 10
   end
   object OpenDialog1: TOpenDialog
     DefaultExt = 'mdb'
@@ -286,43 +273,37 @@ object MainForm: TMainForm
     Left = 601
     Top = 8
   end
-  object ADOQuery1: TADOQuery
-    Connection = ADOConnection1
-    Parameters = <>
-    Left = 344
-    Top = 8
-  end
-  object SynSQLSyn1: TSynSQLSyn
+  object SQLSyntaxHighliter: TSynSQLSyn
     KeyAttri.Foreground = clMenuHighlight
-    Left = 208
-    Top = 8
+    Left = 760
+    Top = 64
   end
   object MainMenu1: TMainMenu
     Left = 416
     Top = 184
-    object Arquivo1: TMenuItem
+    object mnuArquivo: TMenuItem
       Caption = 'Arquivo'
-      object Abrir1: TMenuItem
+      object mnuAbrir: TMenuItem
         Caption = 'Abrir'
         OnClick = AbrirArquivoClick
       end
       object N1: TMenuItem
         Caption = '-'
       end
-      object Sair1: TMenuItem
+      object mnuSair: TMenuItem
         Caption = 'Sair'
-        OnClick = Sair1Click
+        OnClick = mnuSairClick
       end
     end
-    object Visualizar1: TMenuItem
+    object mnuVisualizar: TMenuItem
       Caption = 'Visualizar'
       object NmerodeRegistrosnatabela1: TMenuItem
         Caption = 'N'#250'mero de Registros na tabela'
       end
     end
-    object abelas1: TMenuItem
+    object mnuTabelas: TMenuItem
       Caption = 'Tabelas'
-      object Filtrar1: TMenuItem
+      object mnuFiltrar: TMenuItem
         Caption = 'Filtrar'
       end
     end
@@ -352,5 +333,23 @@ object MainForm: TMainForm
       Caption = 'Medir densidade'
       OnClick = MedirDensidadeClick
     end
+  end
+  object DBConnection: TZConnection
+    ControlsCodePage = cGET_ACP
+    Port = 0
+    Database = 
+      'Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Ello\Dados\Impor' +
+      'tar\Meninaflor.mdb;Persist Security Info=False'
+    Protocol = 'ado'
+    Left = 219
+    Top = 10
+  end
+  object Query: TZQuery
+    Connection = DBConnection
+    SQL.Strings = (
+      'select * from bancos')
+    Params = <>
+    Left = 291
+    Top = 10
   end
 end

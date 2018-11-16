@@ -3,45 +3,44 @@ unit UMainForm;
 interface
 
 uses
-  Windows, Classes, Forms, Controls, Dialogs, DBGrids, StdCtrls, Grids, DB, SynEdit, ADODB, SynHighlighterSQL, SynEditHighlighter, MSAccessU,
-  Menus, ComCtrls, UFileCatcher, Messages;
+  Windows, Classes, Forms, Messages, Controls, Dialogs, DBGrids, StdCtrls, Grids, Menus, ComCtrls, DB, SynEdit,
+  SynHighlighterSQL, MSAccessU, UFileCatcher, ZAbstractConnection, ZConnection, ZAbstractRODataset, ZDataset,
+  ZAbstractDataset, SynEditHighlighter;
 
 type
   TMainForm = class(TForm)
-    ADOConnection1: TADOConnection;
-    ADOTable1: TADOTable;
-    DataSource1: TDataSource;
-    OpenDialog1: TOpenDialog;
-    LBTabelas: TListBox;
-    ADOQuery1: TADOQuery;
-    SqlEditor: TSynEdit;
-    SynSQLSyn1: TSynSQLSyn;
-    MainMenu1: TMainMenu;
-    Arquivo1: TMenuItem;
-    Visualizar1: TMenuItem;
-    Abrir1: TMenuItem;
-    N1: TMenuItem;
-    Sair1: TMenuItem;
-    StatusBar: TStatusBar;
-    abelas1: TMenuItem;
-    Filtrar1: TMenuItem;
-    NmerodeRegistrosnatabela1: TMenuItem;
-    GridPopupMenu: TPopupMenu;
-    mnuColunas: TMenuItem;
-    MainGrid: TDBGrid;
-    N2: TMenuItem;
-    mnuGerarSelect: TMenuItem;
     ColumnPopupMenu: TPopupMenu;
+    DBConnection: TZConnection;
+    DataSource1: TDataSource;
+    GridPopupMenu: TPopupMenu;
+    LBTabelas: TListBox;
+    MainGrid: TDBGrid;
+    MainMenu1: TMainMenu;
+    N1: TMenuItem;
+    N2: TMenuItem;
+    NmerodeRegistrosnatabela1: TMenuItem;
+    OpenDialog1: TOpenDialog;
+    Query: TZQuery;
+    SqlEditor: TSynEdit;
+    StatusBar: TStatusBar;
+    SQLSyntaxHighliter: TSynSQLSyn;
+    mnuAbrir: TMenuItem;
+    mnuArquivo: TMenuItem;
+    mnuColunas: TMenuItem;
     mnuEsconderColuna: TMenuItem;
+    mnuFiltrar: TMenuItem;
+    mnuGerarSelect: TMenuItem;
     mnuMedirDensidade: TMenuItem;
+    mnuSair: TMenuItem;
+    mnuTabelas: TMenuItem;
+    mnuVisualizar: TMenuItem;
     procedure AbrirArquivoClick(Sender: TObject);
     procedure TabelaSelecionadaHandler(Sender: TObject);
     procedure SqlEditorKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure MainGridKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-    procedure Sair1Click(Sender: TObject);
+    procedure mnuSairClick(Sender: TObject);
     procedure mnuGerarSelectClick(Sender: TObject);
-    procedure MainGridMouseDown(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
+    procedure MainGridMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure mnuEsconderColunaClick(Sender: TObject);
     procedure MedirDensidadeClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -98,11 +97,12 @@ var Password: String;
 begin
    Password := XorPassword(LeArquivo(FileName));
 
-   ADOConnection1.Connected := False;
-   ADOConnection1.ConnectionString :=
+   DBConnection.Connected := False;
+   DBConnection.DataBase :=
       'Provider=Microsoft.Jet.OLEDB.4.0; Data Source=' + FileName + ';Persist Security Info=False;Jet OLEDB:Database Password="'+ Password +'"';
 
-   ADOConnection1.Connected := True;
+   DBConnection.Connected := True;
+
    PreencheListaDeTabelas;
    Caption := FileName;
 end;
@@ -110,18 +110,16 @@ end;
 procedure TMainForm.TabelaSelecionadaHandler(Sender: TObject);
 var SelectedTableName: String;
 begin
-   DataSource1.DataSet := ADOTable1;
-
    SelectedTableName := LBTabelas.Items[LBTabelas.ItemIndex];
 
-   ADOTable1.Active := False;
-   ADOTable1.TableName := SelectedTableName;
-   ADOTable1.Active :=  True;
+   Query.Active := False;
+   Query.SQL.Text := 'SELECT * FROM ' + SelectedTableName;
+   Query.Active :=  True;
 
    Caption := FFileName + ' - ' + SelectedTableName;
 
-   StatusBar.Panels[1].Text := Format('%d registros', [ADOTable1.RecordCount]);
-   StatusBar.Panels[2].Text := Format('%d colunas', [ADOTable1.FieldCount]);
+   StatusBar.Panels[1].Text := Format('%d registros', [Query.RecordCount]);
+   StatusBar.Panels[2].Text := Format('%d colunas', [Query.FieldCount]);
 
    AtualizaMenuPopupGrade;
 end;
@@ -130,7 +128,7 @@ procedure TMainForm.PreencheListaDeTabelas;
 var TableNames: TStringList;
 begin
    TableNames := TStringList.Create;
-   ADOConnection1.GetTableNames(TableNames);
+   DBConnection.GetTableNames('', TableNames);
    LBTabelas.Items := TableNames;
    TableNames.Free;
    StatusBar.Panels[0].Text := Format('%d tabelas', [LBTabelas.Count]);
@@ -139,12 +137,11 @@ end;
 procedure TMainForm.SqlEditorKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
    if Key=116 then begin
-      DataSource1.DataSet := ADOQuery1;
-      ADOQuery1.SQL.Text := SqlEditor.Text;
-      ADOQuery1.Open;
+      Query.SQL.Text := SqlEditor.Text;
+      Query.Open;
 
-      StatusBar.Panels[1].Text := Format('%d registros', [ADOQuery1.RecordCount]);
-      StatusBar.Panels[2].Text := Format('%d colunas', [ADOQuery1.FieldCount]);
+      StatusBar.Panels[1].Text := Format('%d registros', [Query.RecordCount]);
+      StatusBar.Panels[2].Text := Format('%d colunas', [Query.FieldCount]);
    end;
 end;
 
@@ -155,7 +152,7 @@ begin
    end;
 end;
 
-procedure TMainForm.Sair1Click(Sender: TObject);
+procedure TMainForm.mnuSairClick(Sender: TObject);
 begin
    Application.Terminate;
 end;
@@ -261,18 +258,18 @@ var
 begin
    MainGrid.SelectedIndex := mnuMedirDensidade.Tag;
 
-   TotalNumberRows := ADOQuery1.RecordCount;
-   Bookmark := ADOQuery1.GetBookmark;
+   TotalNumberRows := Query.RecordCount;
+   Bookmark := Query.GetBookmark;
 
-   ADOQuery1.DisableControls;
-   ADOQuery1.First;
+   Query.DisableControls;
+   Query.First;
 
    sl := TStringList.Create;
    sl.Sorted := True;
    sl.Duplicates := dupIgnore;
-   while not ADOQuery1.Eof do begin
+   while not Query.Eof do begin
       sl.Add(MainGrid.SelectedField.AsString);
-      ADOQuery1.Next;
+      Query.Next;
    end;
    DistinctValues := sl.Count;
    sl.Free;
@@ -281,8 +278,8 @@ begin
 
    ShowMessage(Format('%.4f%%', [Selectivity]));
 
-   ADOQuery1.GotoBookmark(Bookmark);
-   ADOQuery1.EnableControls;
+   Query.GotoBookmark(Bookmark);
+   Query.EnableControls;
 end;
 
 procedure TMainForm.WMDropFiles(var Msg: TWMDropFiles);
