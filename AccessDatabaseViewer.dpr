@@ -4,7 +4,8 @@ uses
   Forms,
   UMainForm in 'UMainForm.pas' {MainForm},
   MSAccessU in 'Source\MSAccessU.pas',
-  UFileCatcher in 'Source\UFileCatcher.pas';
+  UFileCatcher in 'Source\UFileCatcher.pas',
+  UFormDBType in 'Source\UI\UFormDBType.pas' {FrmDBType};
 
 {$R *.res}
 

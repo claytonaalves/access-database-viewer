@@ -54,6 +54,10 @@ type
     function FixQuotes(S: String): String;
     procedure WMDropFiles(var Msg: TWMDropFiles); message WM_DROPFILES;
     procedure OpenAccessDatabaseFile(const Filename: String);
+    procedure OpenAccessDatabase;
+    procedure OpenFirebirdDatabase;
+    procedure OpenSQLiteDatabase;
+    procedure OpenMySQLDatabase;
   end;
 
 var
@@ -61,7 +65,7 @@ var
 
 implementation
 
-uses SysUtils, ShellAPI;
+uses SysUtils, ShellAPI, UFormDBType;
 
 {$R *.dfm}
 
@@ -87,8 +91,61 @@ end;
 
 procedure TMainForm.AbrirArquivoClick(Sender: TObject);
 begin
+   FrmDBType := TFrmDBType.Create(nil);
+
+   if FrmDBType.ShowModal = mrOk then begin
+      case FrmDBType.LBDatabases.ItemIndex of
+         0: OpenAccessDatabase;
+         1: OpenFirebirdDatabase;
+         2: OpenMySQLDatabase;
+         3: OpenSQLiteDatabase;
+      end;
+   end;
+end;
+
+procedure TMainForm.OpenMySQLDatabase;
+begin
+   DBConnection.Connected := False;
+   DBConnection.Protocol := 'mysql-5';
+   DBConnection.HostName := '10.1.1.100';
+   DBConnection.User := 'root';
+   DBConnection.Password := '1234';
+   DBConnection.Database := 'vigo_erp';
+   DBConnection.Connected := True;
+
+   PreencheListaDeTabelas;
+   Caption := '';
+end;
+
+procedure TMainForm.OpenSQLiteDatabase;
+begin
    if not OpenDialog1.Execute then Exit;
 
+   DBConnection.Connected := False;
+   DBConnection.Protocol := 'sqlite-3';
+   DBConnection.DataBase := OpenDialog1.FileName;
+   DBConnection.Connected := True;
+
+   PreencheListaDeTabelas;
+   Caption := '';
+end;
+
+procedure TMainForm.OpenFirebirdDatabase;
+begin
+   if not OpenDialog1.Execute then Exit;
+
+   DBConnection.Connected := False;
+   DBConnection.Protocol := 'firebird-2.5';
+   DBConnection.DataBase := OpenDialog1.FileName;
+   DBConnection.Connected := True;
+
+   PreencheListaDeTabelas;
+   Caption := '';
+end;
+
+procedure TMainForm.OpenAccessDatabase;
+begin
+   if not OpenDialog1.Execute then Exit;
    OpenAccessDatabaseFile(OpenDialog1.FileName);
 end;
 
@@ -98,6 +155,7 @@ begin
    Password := XorPassword(LeArquivo(FileName));
 
    DBConnection.Connected := False;
+   DBConnection.Protocol := 'ado';
    DBConnection.DataBase :=
       'Provider=Microsoft.Jet.OLEDB.4.0; Data Source=' + FileName + ';Persist Security Info=False;Jet OLEDB:Database Password="'+ Password +'"';
 
