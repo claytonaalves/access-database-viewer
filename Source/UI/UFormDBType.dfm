@@ -33,7 +33,8 @@ object FrmDBType: TFrmDBType
       'MS Access'
       'Firebird'
       'MySQL'
-      'SQLite')
+      'SQLite'
+      'SQLServer')
     ParentFont = False
     TabOrder = 0
     OnDblClick = LBDatabasesDblClick

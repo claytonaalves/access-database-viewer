@@ -60,6 +60,7 @@ type
     procedure OpenFirebirdDatabase;
     procedure OpenSQLiteDatabase;
     procedure OpenMySQLDatabase;
+    procedure OpenSQLServerDatabase;
     function GetColumnDensity(ColumnIndex: Integer): Double;
   end;
 
@@ -102,6 +103,7 @@ begin
          1: OpenFirebirdDatabase;
          2: OpenMySQLDatabase;
          3: OpenSQLiteDatabase;
+         4: OpenSQLServerDatabase;
       end;
    end;
 end;
@@ -140,6 +142,17 @@ begin
    DBConnection.Connected := False;
    DBConnection.Protocol := 'firebird-2.5';
    DBConnection.DataBase := OpenDialog1.FileName;
+   DBConnection.Connected := True;
+
+   PreencheListaDeTabelas;
+   Caption := '';
+end;
+
+procedure TMainForm.OpenSQLServerDatabase;
+begin
+   DBConnection.Connected := False;
+   DBConnection.Protocol := 'ado'; // não consegui fazer conectar direto sem ser por ADO
+   DBConnection.DataBase := 'DSN=cmm;Uid=sa;Pwd=VaiSeFuder100Vezes___';
    DBConnection.Connected := True;
 
    PreencheListaDeTabelas;
